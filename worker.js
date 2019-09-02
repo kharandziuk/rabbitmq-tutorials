@@ -6,6 +6,7 @@ require('amqplib').connect('amqp://localhost').then(async(connection) => {
     durable: true
   });
 
+  channel.prefetch(1);
   console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", queue);
   channel.consume(queue, function(msg) {
     const secs = msg.content.toString().split('').length - 1;

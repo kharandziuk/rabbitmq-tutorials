@@ -1,15 +1,15 @@
+const faker = require('faker');
+
 require('amqplib').connect('amqp://localhost').then(async(connection) => {
   const channel = await connection.createChannel()
-  const queue = 'task_queue';
-  const msg = process.argv.slice(2).join(' ') || "Hello World!";
+  const exchange = 'logs'
+  const msg = faker.name.firstName()
 
-  channel.assertQueue(queue, {
-      durable: true
+  channel.assertExchange(exchange, 'fanout', {
+      durable: false
   });
   channel.assertExchange('logs', 'fanout', {durable: false})
-  channel.sendToQueue(queue, Buffer.from(msg), {
-      persistent: true
-  });
+  channel.publish(exchange, '', Buffer.from(msg));
   console.log(" [x] Sent '%s'", msg);
   setTimeout(function() {
         connection.close();
